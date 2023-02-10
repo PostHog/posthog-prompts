@@ -1,9 +1,0 @@
-{
-    "title": "Invite your local teammates!",
-    "body": "<a href='posthog.com'>PostHog</a> is better with your team.<br>Invite them to join you.",
-    "primaryButtonText": "Invite",
-    "primaryButtonURL": "https://posthog.com/invite",
-    "secondaryButtonText": "No thanks",
-    "location": "relative-bottom",
-    "locationCSSSelector": "[data-attr='learn-react-link']"
-}

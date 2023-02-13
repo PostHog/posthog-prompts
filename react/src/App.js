@@ -1,4 +1,3 @@
-import logo from "./logo.svg";
 import "./App.css";
 import posthog from "posthog-js";
 import { Popup } from "./Popup";

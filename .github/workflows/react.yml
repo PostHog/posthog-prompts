@@ -23,3 +23,7 @@ jobs:
       - name: Run ESLint
         working-directory: react/
         run: npx eslint .
+
+      - name: App can start without errors
+        working-directory: react/
+        run: npm start

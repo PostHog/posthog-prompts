@@ -31,8 +31,7 @@
     padding-top: 5px;
     max-width: 300px;
     min-height: 100px;
-    box-shadow: -6px 0 16px -8px rgb(0 0 0 / 8%), -9px 0 28px 0 rgb(0 0 0 / 5%),
-        -12px 0 48px 16px rgb(0 0 0 / 3%);
+    box-shadow: -6px 0 16px -8px rgb(0 0 0 / 8%), -9px 0 28px 0 rgb(0 0 0 / 5%), -12px 0 48px 16px rgb(0 0 0 / 3%);
 }
 .popup .contents {
     color: #2d2d2d;

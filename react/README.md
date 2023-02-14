@@ -4,6 +4,7 @@
 
 1. `npm install`
 2. `npm run start`
+3. Create a feature flag with the format described in [the PostHog Popup readme](../README.md)
 
 ## Install on your website
 

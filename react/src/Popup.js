@@ -59,7 +59,7 @@ export function findRelativeElement(cssSelector) {
 
 function initPopUp(payload, flag, setPayload, setActiveFlag, setLocationCSS, setShowPopup, posthog) {
     if (!payload || !payload.location) {
-        // indicates that it's likely not a popup
+        // indicates that it's not a valid popup
         return
     }
 

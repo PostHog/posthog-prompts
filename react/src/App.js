@@ -1,8 +1,6 @@
 import './App.css'
-import posthog from 'posthog-js'
 import { Popup } from './Popup'
-
-posthog.init(process.env.REACT_APP_POSTHOG_API_KEY, { api_host: process.env.REACT_APP_POSTHOG_HOST })
+import { PostHogProvider } from 'posthog-js/react'
 
 function App() {
     return (
@@ -22,7 +20,14 @@ function App() {
                     </a>
                 </p>
             </header>
-            <Popup />
+            <PostHogProvider
+                apiKey={process.env.REACT_APP_POSTHOG_API_KEY}
+                options={{
+                    api_host: process.env.REACT_APP_POSTHOG_HOST,
+                }}
+            >
+                <Popup />
+            </PostHogProvider>
         </div>
     )
 }

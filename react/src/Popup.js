@@ -4,7 +4,7 @@ import './Popup.css'
 
 import EXAMPLE_FLAG_POPUP from './example-flag-popup.json'
 
-import posthog from 'posthog-js'
+import { useActiveFeatureFlags, usePostHog } from 'posthog-js/react'
 import { generateLocationCSS, generateTooltipPointerStyle } from './popup-location'
 
 const DEBUG_SHOW_LOCAL_POPUP = false
@@ -15,12 +15,14 @@ function getFeatureSessionStorageKey(featureFlagName) {
 }
 
 function shouldShowPopup(featureFlagName) {
+    // The feature flag should have be disabled for the user once the popup has been shown
+    // This is a second check for shorter-term preventing of the popup from showing
     const flagNotShownBefore = !localStorage.getItem(getFeatureSessionStorageKey(featureFlagName))
 
     return flagNotShownBefore || DEBUG_IGNORE_LOCAL_STORAGE
 }
 
-function sendPopupEvent(event, flag, payload, buttonType = null) {
+function sendPopupEvent(event, flag, payload, posthog, buttonType = null) {
     if (buttonType) {
         posthog.capture(event, {
             popupFlag: flag,
@@ -35,7 +37,7 @@ function sendPopupEvent(event, flag, payload, buttonType = null) {
     }
 }
 
-function closePopUp(featureFlagName, payload, setShowPopup, buttonType) {
+function closePopUp(featureFlagName, payload, setShowPopup, buttonType, posthog) {
     setShowPopup(false)
     localStorage.setItem(getFeatureSessionStorageKey(featureFlagName), true)
     posthog.people.set({ ['$' + featureFlagName]: new Date().toDateString() })
@@ -44,7 +46,7 @@ function closePopUp(featureFlagName, payload, setShowPopup, buttonType) {
         window.open(payload.primaryButtonURL, '_blank')
     }
 
-    sendPopupEvent('popup closed', featureFlagName, payload, buttonType)
+    sendPopupEvent('popup closed', featureFlagName, payload, posthog, buttonType)
 }
 
 export function findRelativeElement(cssSelector) {
@@ -55,43 +57,59 @@ export function findRelativeElement(cssSelector) {
     return el
 }
 
+function initPopUp(payload, flag, setPayload, setActiveFlag, setLocationCSS, setShowPopup, posthog) {
+    if (!payload || !payload.location) {
+        // indicates that it's likely not a popup
+        return
+    }
+
+    setPayload(payload)
+    try {
+        setLocationCSS(generateLocationCSS(payload.location, payload.locationCSSSelector))
+    } catch (e) {
+        console.error(e)
+        return
+    }
+    if (shouldShowPopup(flag)) {
+        setActiveFlag(flag)
+        setShowPopup(true)
+
+        sendPopupEvent('popup shown', flag, payload, posthog)
+    }
+}
+
 export function Popup() {
     const [showPopup, setShowPopup] = useState(false)
     const [payload, setPayload] = useState({})
     const [locationCSS, setLocationCSS] = useState({})
     const [activeFlag, setActiveFlag] = useState(null)
-
-    function initPopUp(payload, flag) {
-        setPayload(payload)
-        try {
-            setLocationCSS(generateLocationCSS(payload.location, payload.locationCSSSelector))
-        } catch (e) {
-            console.error(e)
-            return
-        }
-        if (shouldShowPopup(flag)) {
-            setActiveFlag(flag)
-            setShowPopup(true)
-
-            sendPopupEvent('popup shown', flag, payload)
-        }
-    }
+    const posthog = usePostHog()
+    const activeFlags = useActiveFeatureFlags()
 
     useEffect(() => {
         if (DEBUG_SHOW_LOCAL_POPUP) {
-            initPopUp(EXAMPLE_FLAG_POPUP, 'popup-example')
+            initPopUp(
+                EXAMPLE_FLAG_POPUP,
+                'popup-example',
+                setPayload,
+                setActiveFlag,
+                setLocationCSS,
+                setShowPopup,
+                posthog
+            )
         } else {
-            posthog.onFeatureFlags((flags) => {
-                for (const flag of flags) {
-                    if (flag.startsWith('popup-') && posthog.isFeatureEnabled(flag)) {
-                        const payload = posthog.getFeatureFlagPayload(flag)
-                        initPopUp(payload, flag)
-                        return
-                    }
+            if (!activeFlags) {
+                return
+            }
+            for (const flag of activeFlags) {
+                if (flag.startsWith('popup-') && posthog.isFeatureEnabled(flag)) {
+                    const payload = posthog.getFeatureFlagPayload(flag)
+                    initPopUp(payload, flag, setPayload, setActiveFlag, setLocationCSS, setShowPopup, posthog)
+                    return
                 }
-            })
+            }
         }
-    }, [])
+    }, [activeFlags])
 
     return (
         <div className="popup" style={{ display: showPopup ? 'flex' : 'none', ...locationCSS }}>
@@ -109,7 +127,7 @@ export function Popup() {
                     {payload?.secondaryButtonText && (
                         <button
                             className="popup-close-button"
-                            onClick={() => closePopUp(activeFlag, payload, setShowPopup, 'secondary')}
+                            onClick={() => closePopUp(activeFlag, payload, setShowPopup, 'secondary', posthog)}
                         >
                             {payload.secondaryButtonText}
                         </button>
@@ -117,7 +135,7 @@ export function Popup() {
                     {payload.primaryButtonText && (
                         <button
                             className="popup-book-button"
-                            onClick={() => closePopUp(activeFlag, payload, setShowPopup, 'primary')}
+                            onClick={() => closePopUp(activeFlag, payload, setShowPopup, 'primary', posthog)}
                         >
                             {payload.primaryButtonText}
                         </button>

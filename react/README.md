@@ -2,9 +2,10 @@
 
 ## Running the demo project
 
-1. `npm install`
-2. `npm run start`
-3. Create a feature flag with the format described in [the PostHog Popup readme](../README.md)
+1. Copy over `.env.local.env` to `.env.local` and add your API key
+2. `npm install`
+3. `npm run start`
+4. Create a feature flag with the format described in [the PostHog Popup readme](../README.md)
 
 ## Install on your website
 

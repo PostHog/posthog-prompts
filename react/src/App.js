@@ -2,11 +2,7 @@ import './App.css'
 import posthog from 'posthog-js'
 import { Popup } from './Popup'
 
-posthog.init(
-    // new
-    'phc_aIYpRzs2pU7hk93fqoTWtNezdeMUsNRCQFw7vnvDoOs',
-    { api_host: 'https://app.posthog.com' }
-)
+posthog.init(process.env.REACT_APP_POSTHOG_API_KEY, { api_host: process.env.REACT_APP_POSTHOG_HOST })
 
 function App() {
     return (

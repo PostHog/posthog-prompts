@@ -2,13 +2,8 @@ import React, { useState, useEffect } from 'react'
 
 import './Popup.css'
 
-import EXAMPLE_FLAG_POPUP from './example-flag-popup.json'
-
 import { useActiveFeatureFlags, usePostHog } from 'posthog-js/react'
 import { generateLocationCSS, generateTooltipPointerStyle } from './popup-location'
-
-const DEBUG_SHOW_LOCAL_POPUP = false
-const DEBUG_IGNORE_LOCAL_STORAGE = false
 
 function getFeatureSessionStorageKey(featureFlagName) {
     return `ph-popup-${featureFlagName}`
@@ -19,7 +14,7 @@ function shouldShowPopup(featureFlagName) {
     // This is a second check for shorter-term preventing of the popup from showing
     const flagNotShownBefore = !localStorage.getItem(getFeatureSessionStorageKey(featureFlagName))
 
-    return flagNotShownBefore || DEBUG_IGNORE_LOCAL_STORAGE
+    return flagNotShownBefore
 }
 
 function sendPopupEvent(event, flag, payload, posthog, buttonType = null) {
@@ -87,26 +82,14 @@ export function Popup() {
     const activeFlags = useActiveFeatureFlags()
 
     useEffect(() => {
-        if (DEBUG_SHOW_LOCAL_POPUP) {
-            initPopUp(
-                EXAMPLE_FLAG_POPUP,
-                'popup-example',
-                setPayload,
-                setActiveFlag,
-                setLocationCSS,
-                setShowPopup,
-                posthog
-            )
-        } else {
-            if (!activeFlags) {
+        if (!activeFlags) {
+            return
+        }
+        for (const flag of activeFlags) {
+            if (flag.startsWith('popup-') && posthog.isFeatureEnabled(flag)) {
+                const payload = posthog.getFeatureFlagPayload(flag)
+                initPopUp(payload, flag, setPayload, setActiveFlag, setLocationCSS, setShowPopup, posthog)
                 return
-            }
-            for (const flag of activeFlags) {
-                if (flag.startsWith('popup-') && posthog.isFeatureEnabled(flag)) {
-                    const payload = posthog.getFeatureFlagPayload(flag)
-                    initPopUp(payload, flag, setPayload, setActiveFlag, setLocationCSS, setShowPopup, posthog)
-                    return
-                }
             }
         }
     }, [activeFlags])

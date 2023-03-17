@@ -86,13 +86,13 @@ export function Popup() {
             return
         }
         for (const flag of activeFlags) {
-            if (flag.startsWith('popup-') && posthog.isFeatureEnabled(flag)) {
-                const payload = posthog.getFeatureFlagPayload(flag)
+            if (flag.startsWith('popup-') && posthog?.isFeatureEnabled(flag)) {
+                const payload = posthog?.getFeatureFlagPayload(flag)
                 initPopUp(payload, flag, setPayload, setActiveFlag, setLocationCSS, setShowPopup, posthog)
                 return
             }
         }
-    }, [activeFlags])
+    }, [activeFlags, posthog])
 
     return (
         <div className="popup" style={{ display: showPopup ? 'flex' : 'none', ...locationCSS }}>

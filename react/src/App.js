@@ -1,10 +1,12 @@
 import './App.css'
+import { NewFeatureBanner } from './Banner'
 import { Popup } from './Popup'
 import { PostHogProvider } from 'posthog-js/react'
 
 function App() {
     return (
         <div className="App">
+            <NewFeatureBanner />
             <img src="https://posthog.com/brand/posthog-logo.svg" className="App-logo" alt="logo" />
             <header className="App-header">
                 <h1>PostHog Popups</h1>

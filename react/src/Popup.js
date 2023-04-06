@@ -65,7 +65,7 @@ function initPopUp(payload, flag, setPayload, setActiveFlag, setLocationCSS, set
         console.error(e)
         return
     }
-    if (shouldShowPopup(flag)) {
+    if (shouldShowPopup(flag) || true) {
         setActiveFlag(flag)
         setShowPopup(true)
 
@@ -86,7 +86,7 @@ export function Popup() {
             return
         }
         for (const flag of activeFlags) {
-            if (flag.startsWith('popup-') && posthog?.isFeatureEnabled(flag)) {
+            if (flag.startsWith('flag-') && posthog?.isFeatureEnabled(flag)) {
                 const payload = posthog?.getFeatureFlagPayload(flag)
                 initPopUp(payload, flag, setPayload, setActiveFlag, setLocationCSS, setShowPopup, posthog)
                 return

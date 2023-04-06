@@ -1,0 +1,47 @@
+.banner {
+    transition: margin 200ms ease;
+    flex-shrink: 0;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background: #000;
+    font-size: 1rem;
+    color: white;
+    height: 3rem;
+    padding: 0 1rem 0 0.5rem;
+    padding-top: 5px;
+    text-align: center;
+    position: relative;
+}
+.banner p {
+    margin: 0;
+}
+
+.banner a:link {
+    color: var(--blue-light);
+    text-decoration: underline;
+}
+
+.banner a:visited {
+    color: var(--purple-light);
+}
+
+.NewFeatureAnnouncement__button:link,
+.NewFeatureAnnouncement__button:visited {
+    color: #2d2d2d;
+    background-color: #dcb1e3;
+    margin-left: 8px;
+    margin-right: 8px;
+}
+
+.Announcement__close {
+    display: flex;
+    position: absolute;
+    right: 0.5rem;
+    cursor: pointer;
+    font-size: 1.25rem;
+    padding: 0.125rem;
+    @include screen($sm) {
+        right: 1rem;
+    }
+}
